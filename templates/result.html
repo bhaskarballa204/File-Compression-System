@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Processing Result</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="logo">FileZip</div>
+        <a href="/">Home</a>
+    </header>
+
+    <main class="result-container">
+
+        <div class="success-icon">✓</div>
+
+        <h1>{{ result.operation }} Successful!</h1>
+
+        <p>Your file has been processed successfully.</p>
+
+        <div class="result-card">
+
+            <h2>File Details</h2>
+
+            <div class="detail">
+                <span>Input File</span>
+                <strong>{{ result.original_name }}</strong>
+            </div>
+
+            <div class="detail">
+                <span>Output File</span>
+                <strong>{{ result.output_name }}</strong>
+            </div>
+
+            {% if result.operation == "Compression" %}
+
+            <div class="detail">
+                <span>Original Size</span>
+                <strong>{{ result.original_size }} bytes</strong>
+            </div>
+
+            <div class="detail">
+                <span>Compressed Size</span>
+                <strong>{{ result.compressed_size }} bytes</strong>
+            </div>
+
+            <div class="detail">
+                <span>Space Saved</span>
+                <strong>{{ result.saved_bytes }} bytes</strong>
+            </div>
+
+            <div class="detail highlight">
+                <span>Compression Change</span>
+                <strong>{{ result.saving_percentage }}%</strong>
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <a href="{{ result.download_url }}" class="btn download-btn">
+            Download Output File
+        </a>
+
+        <a href="/" class="back-link">Back to Home</a>
+
+    </main>
+
+    <footer>
+        <p>File Compression System | Huffman Coding</p>
+    </footer>
+
+</body>
+</html>

@@ -1,157 +1,101 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>File Compression System</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
-
     <header class="header">
         <div class="logo">FileZip</div>
-        <nav>
-            <a href="/">Home</a>
-            <a href="#compress">Compress</a>
-            <a href="#decompress">Decompress</a>
-        </nav>
+        <nav><a href="/">Home</a><a href="#compress">Compress</a><a href="#decompress">Decompress</a></nav>
     </header>
 
     <section class="hero">
         <h1>Smart File Compression System</h1>
-
-        <p>
-            Compress your text files using Huffman Coding.
-            Reduce file size and restore your original files anytime.
-        </p>
-
-        <span class="technology">Powered by Python & DSA</span>
+        <p>Choose a target size or percentage reduction. The system tests lossless methods and reports the actual result.</p>
+        <span class="technology">Python · Flask · Huffman Coding · Lossless Compression</span>
     </section>
 
     <main class="main-container">
-
-        {% if error %}
-        <div class="error-message">
-            {{ error }}
-        </div>
-        {% endif %}
-
+        {% if error %}<div class="error-message">{{ error }}</div>{% endif %}
         <div class="cards">
-
-            <!-- Compression Card -->
             <section class="card" id="compress">
-
                 <div class="card-icon">📦</div>
-
                 <h2>Compress File</h2>
+                <p>Choose how small you would like the output to be. The target is best-effort; lossless compression cannot guarantee every requested size.</p>
+                <form action="/compress" method="POST" enctype="multipart/form-data">
+                    <label for="file">Select a file (max 10 MB)</label>
+                    <input type="file" id="file" name="file" accept=".txt,.pdf,.doc,.docx" required>
 
-                <p>
-                    Upload a text file to compress it
-                    using the Huffman Coding algorithm.
-                </p>
+                    <label for="target_mode">Compression target</label>
+                    <select id="target_mode" name="target_mode">
+                        <option value="percentage" selected>Percentage reduction</option>
+                        <option value="size">Target output size (MB)</option>
+                    </select>
 
-                <form action="/compress"
-                      method="POST"
-                      enctype="multipart/form-data">
+                    <label for="target_value" id="target_label">Desired reduction (%)</label>
+                    <input type="number" id="target_value" name="target_value" min="1" max="95" step="0.1" value="30" required>
 
-                    <label for="file">Select a text file</label>
+                    <label for="compression_level">Compression effort</label>
+                    <select id="compression_level" name="compression_level">
+                        <option value="low">Low – faster</option>
+                        <option value="medium" selected>Medium – balanced</option>
+                        <option value="high">High – try stronger methods</option>
+                    </select>
 
-  <input type="file" id="file" name="file"
-accept=".txt,.pdf,.doc,.docx" required>
-
-                    <button type="submit" class="btn">
-                        Compress File
-                    </button>
-
+                    <button type="submit" class="btn">Compress File</button>
                 </form>
-
             </section>
 
-
-            <!-- Decompression Card -->
             <section class="card" id="decompress">
-
                 <div class="card-icon">📂</div>
-
                 <h2>Decompress File</h2>
-
-                <p>
-                    Upload your previously compressed
-                    .huff file to restore the original text.
-                </p>
-
-                <form action="/decompress"
-                      method="POST"
-                      enctype="multipart/form-data">
-
-                    <label for="compressed_file">
-                        Select a compressed file
-                    </label>
-
-                    <input
-                        type="file"
-                        id="compressed_file"
-                        name="compressed_file"
-                        accept=".huff"
-                        required
-                    >
-
-                    <button type="submit" class="btn secondary">
-                        Decompress File
-                    </button>
-
+                <p>Upload a previously compressed .huff file to restore the original file. Older Huffman files are supported too.</p>
+                <form action="/decompress" method="POST" enctype="multipart/form-data">
+                    <label for="compressed_file">Select a compressed file</label>
+                    <input type="file" id="compressed_file" name="compressed_file" accept=".huff" required>
+                    <button type="submit" class="btn secondary">Decompress File</button>
                 </form>
-
             </section>
-
         </div>
 
         <section class="info-section">
-
             <h2>How Does It Work?</h2>
-
             <div class="steps">
-
-                <div class="step">
-                    <span>01</span>
-                    <h3>Upload</h3>
-                    <p>Select your text file.</p>
-                </div>
-
-                <div class="step">
-                    <span>02</span>
-                    <h3>Analyze</h3>
-                    <p>Count character frequencies.</p>
-                </div>
-
-                <div class="step">
-                    <span>03</span>
-                    <h3>Compress</h3>
-                    <p>Generate Huffman binary codes.</p>
-                </div>
-
-                <div class="step">
-                    <span>04</span>
-                    <h3>Download</h3>
-                    <p>Save your compressed file.</p>
-                </div>
-
+                <div class="step"><span>01</span><h3>Upload</h3><p>Select your file.</p></div>
+                <div class="step"><span>02</span><h3>Set a target</h3><p>Choose MB or percentage.</p></div>
+                <div class="step"><span>03</span><h3>Compare</h3><p>Test lossless compression methods.</p></div>
+                <div class="step"><span>04</span><h3>Download</h3><p>Review the actual result.</p></div>
             </div>
-
+            <p class="note">Note: already-compressed files such as many PDFs and DOCX files may not become smaller. The application never truncates or damages a file to meet a target.</p>
         </section>
-
     </main>
 
-    <footer>
-        <p>File Compression System | Python Flask | Huffman Coding</p>
-        <p>Academic DSA Project</p>
-    </footer>
+    <footer><p>File Compression System | Python Flask | Huffman Coding</p><p>Academic DSA Project</p></footer>
 
+    <script>
+        const mode = document.getElementById("target_mode");
+        const value = document.getElementById("target_value");
+        const label = document.getElementById("target_label");
+
+        function updateTargetInput() {
+            if (mode.value === "size") {
+                label.textContent = "Desired output size (MB)";
+                value.min = "0.01";
+                value.max = "10";
+                value.step = "0.01";
+                value.value = "2";
+            } else {
+                label.textContent = "Desired reduction (%)";
+                value.min = "1";
+                value.max = "95";
+                value.step = "1";
+                value.value = "30";
+            }
+        }
+        mode.addEventListener("change", updateTargetInput);
+    </script>
 </body>
 </html>
-

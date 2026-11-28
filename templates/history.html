@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>FileZip | History</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><header class="header"><a class="logo" href="/">FileZip</a><nav><a href="/">Home</a><a href="/#compress">Compress</a></nav></header>
+<main class="container history-page"><span class="section-kicker">ACTIVITY</span><h1>Compression history</h1><p>Latest 100 file operations are recorded on this server.</p>
+{% if history %}<div class="history-list">{% for item in history %}<div class="history-row"><div><strong>{{ item.input_name }}</strong><small>{{ item.date }} · {{ item.operation }} · Output: {{ item.output_name }}</small></div><div class="history-stats"><strong>{{ item.reduction }}%</strong><small>reduction</small></div></div>{% endfor %}</div>
+{% else %}<p class="empty">No activity recorded yet.</p>{% endif %}<a class="back-link" href="/">← Back to Home</a></main><footer><strong>FileZip</strong><span>File processing history</span></footer></body></html>

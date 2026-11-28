@@ -1,43 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Processing Result</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileZip | Results</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <header class="header"><div class="logo">FileZip</div><a href="/">Home</a></header>
-    <main class="result-container">
-        <div class="success-icon">✓</div>
-        <h1>{{ result.operation }} Successful!</h1>
-        <p>Your file has been processed. Review the actual result below.</p>
-        <div class="result-card">
-            <h2>File Details</h2>
-            <div class="detail"><span>Input File</span><strong>{{ result.original_name }}</strong></div>
-            <div class="detail"><span>Output File</span><strong>{{ result.output_name }}</strong></div>
-            {% if result.operation == "Compression" %}
-                <div class="detail"><span>Original Size</span><strong>{{ result.original_size }} bytes</strong></div>
-                <div class="detail"><span>Compressed Size</span><strong>{{ result.compressed_size }} bytes</strong></div>
-                <div class="detail"><span>Space Saved</span><strong>{{ result.saved_bytes }} bytes</strong></div>
-                <div class="detail highlight"><span>Actual Reduction</span><strong>{{ result.saving_percentage }}%</strong></div>
-                <div class="detail"><span>Requested Target</span><strong>{{ result.target_size }} bytes</strong></div>
-                <div class="detail"><span>Compression effort</span><strong>{{ result.compression_level }}</strong></div>
-                <div class="target-message {% if not result.target_met %}warning{% endif %}">
-                    {% if result.target_met %}
-                        The selected output-size target was achieved.
-                    {% else %}
-                        The requested target could not be reached with lossless compression. The closest smallest valid file is provided.
-                    {% endif %}
-                </div>
-                {% if result.saving_percentage <= 0 %}
-                    <p class="note">This file did not become smaller. Some file formats already contain compression.</p>
-                {% endif %}
-            {% endif %}
-        </div>
-        <a href="{{ result.download_url }}" class="btn download-btn">Download Output File</a>
-        <a href="/" class="back-link">Back to Home</a>
-    </main>
-    <footer><p>File Compression System | Huffman Coding and lossless codecs</p></footer>
-</body>
-</html>
+<header class="header"><a class="logo" href="/">FileZip</a><nav><a href="/">Home</a><a href="/history">History</a></nav></header>
+<main class="container result-page">
+    <div class="result-heading"><span class="success-mark">✓</span><span class="section-kicker">PROCESSING COMPLETE</span><h1>Your files are ready</h1><p>Review each result and download the output.</p></div>
+    {% if errors %}<div class="alert error">{% for error in errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+    {% for result in results %}
+    <section class="result-card">
+        <div class="result-title"><div><span class="section-kicker">{{ result.operation }}</span><h2>{{ result.original_name }}</h2></div><span class="pill">{{ result.method|default("Original file restored") }}</span></div>
+        <div class="result-details"><div><small>Output filename</small><strong>{{ result.output_name }}</strong></div>
+        {% if result.operation == "Compression" %}
+        <div><small>Original size</small><strong>{{ "%.2f"|format(result.original_size / 1048576) }} MB</strong></div>
+        <div><small>Output size</small><strong>{{ "%.2f"|format(result.compressed_size / 1048576) }} MB</strong></div>
+        <div><small>Space saved</small><strong>{{ "%.2f"|format(result.saved_bytes / 1048576) }} MB</strong></div>
+        <div><small>Actual reduction</small><strong class="{% if result.saving_percentage > 0 %}positive{% else %}negative{% endif %}">{{ result.saving_percentage }}%</strong></div>
+        <div><small>Requested target</small><strong>{% if result.target_met %}Achieved{% else %}Not achievable losslessly{% endif %}</strong></div>
+        {% endif %}</div>
+        {% if result.operation == "Compression" and not result.target_met %}<p class="notice">The requested target could not be reached without losing data. The best available valid output is provided.</p>{% endif %}
+        {% if result.operation == "Compression" and result.saving_percentage <= 0 %}<p class="notice">This file did not become smaller. Some files are already compressed or cannot be optimized further.</p>{% endif %}
+        <a class="btn download" href="{{ result.download_url }}">Download output <span>↓</span></a>
+    </section>
+    {% endfor %}
+    <a class="back-link" href="/">← Back to FileZip</a>
+</main>
+<footer><strong>FileZip</strong><span>Lossless file processing</span></footer>
+</body></html>

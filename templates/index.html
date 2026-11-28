@@ -3,99 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Compression System</title>
+    <title>FileZip | File Compression System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <header class="header">
-        <div class="logo">FileZip</div>
-        <nav><a href="/">Home</a><a href="#compress">Compress</a><a href="#decompress">Decompress</a></nav>
-    </header>
+<header class="header">
+    <a class="logo" href="/">FileZip</a>
+    <nav><a href="/">Home</a><a href="#compress">Compress</a><a href="#decompress">Decompress</a><a href="/history">History</a></nav>
+</header>
 
-    <section class="hero">
-        <h1>Smart File Compression System</h1>
-        <p>Choose a target size or percentage reduction. The system tests lossless methods and reports the actual result.</p>
-        <span class="technology">Python · Flask · Huffman Coding · Lossless Compression</span>
+<section class="hero">
+    <span class="eyebrow">SMART • LOSSLESS • SIMPLE</span>
+    <h1>File Compression System</h1>
+    <p>Optimize PDFs into readable PDF files and compress other supported files with lossless algorithms.</p>
+    <div class="hero-tags"><span>Huffman</span><span>Zlib</span><span>BZ2</span><span>LZMA</span><span>PDF Optimization</span></div>
+</section>
+
+<main class="container">
+    {% if error %}<div class="alert error">{{ error }}</div>{% endif %}
+    <div class="cards">
+        <section class="card" id="compress">
+            <div class="card-top"><span class="icon">⇧</span><span class="pill">Up to 50 MB each</span></div>
+            <h2>Compress files</h2>
+            <p>Choose one or more TXT, PDF, DOC or DOCX files. PDFs remain valid PDFs after optimization.</p>
+            <form action="/compress" method="POST" enctype="multipart/form-data">
+                <label class="drop-zone" for="files" id="dropZone">
+                    <span class="upload-icon">＋</span>
+                    <strong>Drag files here or browse</strong>
+                    <small id="fileNames">Select multiple files if needed</small>
+                    <input type="file" id="files" name="files" accept=".txt,.pdf,.doc,.docx" multiple required>
+                </label>
+                <div class="form-grid">
+                    <div><label for="target_mode">Target type</label>
+                        <select id="target_mode" name="target_mode">
+                            <option value="percentage">Reduction percentage</option>
+                            <option value="size">Output size (MB)</option>
+                        </select>
+                    </div>
+                    <div><label for="target_value" id="target_label">Desired reduction (%)</label>
+                        <input type="number" id="target_value" name="target_value" min="1" max="95" step="1" value="30" required>
+                    </div>
+                </div>
+                <label for="compression_level">Compression effort (non-PDF files)</label>
+                <select id="compression_level" name="compression_level">
+                    <option value="low">Low — faster</option><option value="medium" selected>Medium — balanced</option><option value="high">High — stronger methods</option>
+                </select>
+                <button class="btn" type="submit">Compress selected files <span>→</span></button>
+            </form>
+            <p class="hint">Targets are best-effort. Lossless compression cannot guarantee a requested size for every file.</p>
+        </section>
+
+        <section class="card" id="decompress">
+            <div class="card-top"><span class="icon green">↧</span><span class="pill green-pill">Restore original</span></div>
+            <h2>Decompress a file</h2>
+            <p>Restore a file previously compressed by this application. The original filename and extension are stored in the compressed header.</p>
+            <form action="/decompress" method="POST" enctype="multipart/form-data">
+                <label class="drop-zone compact" for="compressed_file">
+                    <span class="upload-icon">＋</span><strong>Choose a .huff file</strong>
+                    <small>PDF outputs are already normal PDF files — no decompression needed.</small>
+                    <input type="file" id="compressed_file" name="compressed_file" accept=".huff" required>
+                </label>
+                <button class="btn secondary" type="submit">Decompress file <span>→</span></button>
+            </form>
+        </section>
+    </div>
+
+    <section class="how">
+        <div><span class="section-kicker">WORKFLOW</span><h2>How FileZip works</h2><p>Choose a file, set your target and download the processed output.</p></div>
+        <div class="steps">
+            <div><b>01</b><strong>Upload</strong><small>Select one or multiple files.</small></div>
+            <div><b>02</b><strong>Set target</strong><small>Choose a reduction or output size.</small></div>
+            <div><b>03</b><strong>Optimize</strong><small>Use a suitable lossless method.</small></div>
+            <div><b>04</b><strong>Download</strong><small>Check actual savings and output.</small></div>
+        </div>
     </section>
 
-    <main class="main-container">
-        {% if error %}<div class="error-message">{{ error }}</div>{% endif %}
-        <div class="cards">
-            <section class="card" id="compress">
-                <div class="card-icon">📦</div>
-                <h2>Compress File</h2>
-                <p>Choose how small you would like the output to be. The target is best-effort; lossless compression cannot guarantee every requested size.</p>
-                <form action="/compress" method="POST" enctype="multipart/form-data">
-                    <label for="file">Select a file (max 10 MB)</label>
-                    <input type="file" id="file" name="file" accept=".txt,.pdf,.doc,.docx" required>
-
-                    <label for="target_mode">Compression target</label>
-                    <select id="target_mode" name="target_mode">
-                        <option value="percentage" selected>Percentage reduction</option>
-                        <option value="size">Target output size (MB)</option>
-                    </select>
-
-                    <label for="target_value" id="target_label">Desired reduction (%)</label>
-                    <input type="number" id="target_value" name="target_value" min="1" max="95" step="0.1" value="30" required>
-
-                    <label for="compression_level">Compression effort</label>
-                    <select id="compression_level" name="compression_level">
-                        <option value="low">Low – faster</option>
-                        <option value="medium" selected>Medium – balanced</option>
-                        <option value="high">High – try stronger methods</option>
-                    </select>
-
-                    <button type="submit" class="btn">Compress File</button>
-                </form>
-            </section>
-
-            <section class="card" id="decompress">
-                <div class="card-icon">📂</div>
-                <h2>Decompress File</h2>
-                <p>Upload a previously compressed .huff file to restore the original file. Older Huffman files are supported too.</p>
-                <form action="/decompress" method="POST" enctype="multipart/form-data">
-                    <label for="compressed_file">Select a compressed file</label>
-                    <input type="file" id="compressed_file" name="compressed_file" accept=".huff" required>
-                    <button type="submit" class="btn secondary">Decompress File</button>
-                </form>
-            </section>
+    <section class="history-preview">
+        <div class="section-heading"><div><span class="section-kicker">RECENT ACTIVITY</span><h2>Compression history</h2></div><a href="/history">View all →</a></div>
+        {% if history %}
+        <div class="history-list">
+            {% for item in history %}
+            <div class="history-row"><div><strong>{{ item.input_name }}</strong><small>{{ item.date }} · {{ item.operation }}</small></div><div class="history-stats"><strong>{{ item.reduction }}%</strong><small>reduction</small></div></div>
+            {% endfor %}
         </div>
-
-        <section class="info-section">
-            <h2>How Does It Work?</h2>
-            <div class="steps">
-                <div class="step"><span>01</span><h3>Upload</h3><p>Select your file.</p></div>
-                <div class="step"><span>02</span><h3>Set a target</h3><p>Choose MB or percentage.</p></div>
-                <div class="step"><span>03</span><h3>Compare</h3><p>Test lossless compression methods.</p></div>
-                <div class="step"><span>04</span><h3>Download</h3><p>Review the actual result.</p></div>
-            </div>
-            <p class="note">Note: already-compressed files such as many PDFs and DOCX files may not become smaller. The application never truncates or damages a file to meet a target.</p>
-        </section>
-    </main>
-
-    <footer><p>File Compression System | Python Flask | Huffman Coding</p><p>Academic DSA Project</p></footer>
-
-    <script>
-        const mode = document.getElementById("target_mode");
-        const value = document.getElementById("target_value");
-        const label = document.getElementById("target_label");
-
-        function updateTargetInput() {
-            if (mode.value === "size") {
-                label.textContent = "Desired output size (MB)";
-                value.min = "0.01";
-                value.max = "10";
-                value.step = "0.01";
-                value.value = "2";
-            } else {
-                label.textContent = "Desired reduction (%)";
-                value.min = "1";
-                value.max = "95";
-                value.step = "1";
-                value.value = "30";
-            }
-        }
-        mode.addEventListener("change", updateTargetInput);
-    </script>
+        {% else %}<p class="empty">Your recent file activity will appear here.</p>{% endif %}
+    </section>
+</main>
+<footer><strong>FileZip</strong><span>Python · Flask · Data Structures & Algorithms</span></footer>
+<script>
+const mode = document.getElementById("target_mode");
+const value = document.getElementById("target_value");
+const label = document.getElementById("target_label");
+mode.addEventListener("change", () => {
+    if (mode.value === "size") {
+        label.textContent = "Desired output size (MB)";
+        value.min = "0.01"; value.max = "50"; value.step = "0.01"; value.value = "2";
+    } else {
+        label.textContent = "Desired reduction (%)";
+        value.min = "1"; value.max = "95"; value.step = "1"; value.value = "30";
+    }
+});
+const fileInput = document.getElementById("files");
+const fileNames = document.getElementById("fileNames");
+const dropZone = document.getElementById("dropZone");
+fileInput.addEventListener("change", () => {
+    fileNames.textContent = fileInput.files.length ? Array.from(fileInput.files).map(f => f.name).join(", ") : "Select multiple files if needed";
+});
+["dragenter","dragover"].forEach(evt => dropZone.addEventListener(evt, e => {e.preventDefault(); dropZone.classList.add("dragging");}));
+["dragleave","drop"].forEach(evt => dropZone.addEventListener(evt, e => {e.preventDefault(); dropZone.classList.remove("dragging");}));
+dropZone.addEventListener("drop", e => {
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        fileNames.textContent = Array.from(fileInput.files).map(f => f.name).join(", ");
+    }
+});
+</script>
 </body>
 </html>
